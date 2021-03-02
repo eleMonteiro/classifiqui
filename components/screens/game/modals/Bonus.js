@@ -23,21 +23,23 @@ export default class BonusScreen extends Component {
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         if (!this.state.bonus) {
             const min = 1;
             const max = 11;
             const filho = Math.floor(min + Math.random() * (max - min))
 
-            const bonusRef = database().ref(BONUS).child(filho);
-            bonusRef.on('value', (snapshot) => {
-                this.setState({ bonus: snapshot.val() });
-            })
+            await database().ref(BONUS + filho)
+                .once('value')
+                .then(snapshot => {
+                    this.setState({ bonus: snapshot.val() });
+                })
 
             const sala = this.state.sala
             var player
-            const playerRef = firebase.db.ref(ROOMS + sala.name + PLAYERS).child(this.props.route.params.vez);
-            playerRef.on('value', (snapshot) => {
+            await database().ref(ROOMS + sala.name + PLAYERS + this.props.route.params.vez)
+            .once('value')
+            .then(snapshot => {
                 player = snapshot.val()
             })
 

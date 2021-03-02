@@ -1,10 +1,10 @@
 import React, { Component } from "react";
-import { Image, View, StyleSheet, Button, Alert } from "react-native";
+import { Image, View, StyleSheet, Button, Alert, FlatList } from "react-native";
 
 import { BackHandler } from 'react-native';
 import database from "@react-native-firebase/database"
 
-import Item from './Item'
+import Item from "./Item"
 
 const ROOMS = '/rooms/'
 const ORDEM = '/ordemDeJogada/'
@@ -27,7 +27,6 @@ export default class Game extends Component {
         }
 
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this)
-        this.classificarRequisito = this.classificarRequisito.bind(this)
     }
 
 
@@ -83,7 +82,7 @@ export default class Game extends Component {
         this.setState({ bonus: false })
     }
 
-    classificarRequisito = (requisito, tipo,  indice) => {
+    classificarRequisito = (requisito, tipo, indice) => {
         const _requisito = requisito
         const _tipo = _requisito['tipo']
 
@@ -102,64 +101,57 @@ export default class Game extends Component {
             .update({ classificada: true })
     }
 
-    pontuacao = (user) => {
+    pontuacao = async (user) => {
         const sala = this.state.sala
         var player
 
-        const bonusRef = database().ref(ROOMS + sala.name + PLAYERS).child(user);
-        bonusRef.on('value', (snapshot) => {
+        await database().ref(ROOMS + sala.name + PLAYERS + user)
+        .once('value')
+        .then(snapshot => {
             player = snapshot.val()
         })
 
-        database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
+       await database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
             .update({ pontuacao: player.pontuacao + 1, requisitosClassificados: player.requisitosClassificados + 1 })
 
     }
 
     render() {
-        const { sala, tipos, user, vez, requisitosClassificar, bonus } = this.state
-
-
         return (
             <View style={styles.container}>
-                {!bonus &&
-                    <Item
-                        reqs={requisitosClassificar}
-                        sala={sala}
-                        tipos={tipos}
-                        user={user}
-                        navigation={this.props.navigation}
-                        vez={vez}
-                        mudarVez={this.mudarVez.bind(this)}
-                        classificarRequisito={this.classificarRequisito.bind(this)}
-                    ></Item>
-                }
+                {!this.state.bonus && <Item
+                    requisitos={this.state.requisitosClassificar}
+                    user={this.state.user}
+                    vez={this.state.vez}
+                    tipos={this.state.tipos}
+                    user={this.state.user}
+                    sala={this.state.sala}
+                    mudarVez={this.mudarVez.bind(this)}
+                    classificarRequisito={this.classificarRequisito.bind(this)}
+                    {...this.props}>
+                </Item>}
 
-                {bonus &&
-                    <>
-                        <View style={styles.containerImagemColor}>
-                            <Image source={require('../LOGO-3.1-LARANJA.png')} style={styles.imagem}></Image>
-                            <Button
-                                color='#1785C1'
-                                title='BONUS'
-                                onPress={
-                                    () =>
-                                        this.props.navigation.navigate('Bonus', {
-                                            vez: this.state.vez,
-                                            mudarVez: this.mudarVez.bind(this),
-                                            sala: this.state.sala,
-                                            user: this.state.user
-                                        })
-                                }
-                            />
-                        </View>
-                    </>
+                {this.state.bonus &&
+                    <View style={styles.containerImagemColor}>
+                        <Image source={require('../LOGO-3.1-LARANJA.png')} style={styles.imagem}></Image>
+                        <Button
+                            color='#1785C1'
+                            title='BONUS'
+                            onPress={
+                                () =>
+                                    this.props.navigation.navigate('Bonus', {
+                                        vez: this.state.vez,
+                                        mudarVez: this.mudarVez.bind(this),
+                                        sala: this.state.sala,
+                                        user: this.state.user
+                                    })
+                            }
+                        />
+                    </View>
                 }
             </View>
-
         )
     }
-
 }
 
 const styles = StyleSheet.create({
@@ -185,7 +177,7 @@ const styles = StyleSheet.create({
         height: '100%',
         alignItems: 'stretch',
         justifyContent: 'space-around',
-        backgroundColor: '#fa7921'
+        backgroundColor: '#ffffff'
     },
 
     textRanking: {

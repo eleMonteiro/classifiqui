@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import { Image, View, StyleSheet, Button } from "react-native";
+import { Image, View, StyleSheet, Button, Text } from "react-native";
 
 import storage from "@react-native-firebase/storage";
 
@@ -7,32 +7,16 @@ export default class Game extends Component {
 
     constructor(props) {
         super(props);
-
-        this.getElement = this.getElement.bind(this)
     }
 
-    componentDidMount() {
-        this.getElement()
-    }
-
-    getElement = async () => {
-        const requisitos = this.props.reqs
-
-        for (let i = 0; i < requisitos.length; i++) {
-            const element = requisitos[i];
-
-            if (element.classificada === false) {
-
-                const url = await storage()
-                    .ref(element.url)
-                    .getDownloadURL();
-
-                console.log(url);
-                                
+    getElement = () => {
+        for (let i = 0; i < this.props.requisitos.length; i++) {
+            const element = this.props.requisitos[i];
+            if (element.classificada == false) {
                 return (
                     <View style={styles.containerImagem}>
                         <Image
-                            source={{ uri: url }}
+                            source={{ uri: element.url }}
                             style={styles.imagem}
                         ></Image>
 
@@ -47,6 +31,7 @@ export default class Game extends Component {
                                                 {
                                                     tipos: this.props.tipos,
                                                     req: element,
+                                                    user: this.props.user,
                                                     vez: this.props.vez,
                                                     mudarVez: this.props.mudarVez,
                                                     classificarRequisito: this.props.classificarRequisito,
@@ -78,9 +63,7 @@ export default class Game extends Component {
                 )
             }
         }
-    }
 
-    render() {
         return (
             <View style={styles.containerImagemColor}>
                 <Image source={require('../LOGO-3.1-LARANJA.png')} style={styles.imagem}></Image>
@@ -95,16 +78,19 @@ export default class Game extends Component {
             </View>
         )
     }
+
+
+
+    render() {
+        return (
+            <View style={styles.containerImagem}>
+                {this.getElement()}
+            </View>
+        )
+    }
 }
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'stretch',
-        justifyContent: 'space-around',
-        backgroundColor: '#ffffff',
-    },
-
     imagem: {
         width: '100%',
         height: '80%',

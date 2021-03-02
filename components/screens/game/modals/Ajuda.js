@@ -73,22 +73,24 @@ export default class AjudaScreen extends Component {
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
-    componentDidMount() {
+    async componentDidMount() {
         const sala = this.state.sala
-        const playerRef = database().ref(ROOMS + sala.name + PLAYERS).child(this.props.route.params.vez);
-        playerRef.on('value', (snapshot) => {
-            this.setState({ player: snapshot.val() })
-        })
+
+        await database().ref(ROOMS + sala.name + PLAYERS + this.props.route.params.vez)
+            .once('value')
+            .then(snapshot => {
+                this.setState({ player: snapshot.val() })
+            })
 
         if (!this.state.analista) {
-            const analistaRef = firebase.db.ref(AJUDAS).child('0');
+            const analistaRef = database().ref(AJUDAS).child('0');
             analistaRef.on('value', (snapshot) => {
                 this.setState({ analista: snapshot.val() })
             })
         }
 
         if (!this.state.programador) {
-            const programadorRef = firebase.db.ref(AJUDAS).child('1');
+            const programadorRef = database().ref(AJUDAS).child('1');
             programadorRef.on('value', (snapshot) => {
                 this.setState({ programador: snapshot.val() })
             })
@@ -106,14 +108,15 @@ export default class AjudaScreen extends Component {
         return true;
     }
 
-    usarAnalista = () => {
+    usarAnalista = async () => {
         const sala = this.state.sala
 
         var player
-        const playerRef = database().ref(ROOMS + sala.name + PLAYERS).child(this.props.route.params.vez);
-        playerRef.on('value', (snapshot) => {
-            player = snapshot.val()
-        })
+        await database().ref(ROOMS + sala.name + PLAYERS + this.props.route.params.vez)
+            .once('value')
+            .then(snapshot => {
+                player = snapshot.val()
+            })
 
         database().ref(ROOMS + sala.name + PLAYERS + player.nickname).update({ ajudasAnalista: player.ajudasAnalista - 1 })
 
@@ -147,14 +150,15 @@ export default class AjudaScreen extends Component {
     }
 
 
-    usarProgramador = () => {
+    usarProgramador = async () => {
         const sala = this.state.sala
-        var player
 
-        const playerRef = database().ref(ROOMS + sala.name + PLAYERS).child(this.props.route.params.vez);
-        playerRef.on('value', (snapshot) => {
-            player = snapshot.val()
-        })
+        var player
+        await database().ref(ROOMS + sala.name + PLAYERS + this.props.route.params.vez)
+            .once('value')
+            .then(snapshot => {
+                player = snapshot.val()
+            })
 
 
         database().ref(ROOMS + sala.name + PLAYERS + player.nickname).update({ ajudasProgramador: player.ajudasProgramador - 1 })

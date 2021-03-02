@@ -45,7 +45,8 @@ export default class Initial extends Component {
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-
+        
+        this.getTipos()
         this.getUser()
         this.onSala()
     }
@@ -123,16 +124,14 @@ export default class Initial extends Component {
                 data = snapshot.val()
             })
 
-        console.log(data);
-
         if (data.reqs) {
             var requisitos = data.reqs
             var _requisitos = []
 
-            console.log(requisitos);
-
             if (requisitos) {
                 for (var [key, value] of Object.entries(requisitos)) {
+                    const url = await storage().ref(value.url).getDownloadURL()
+                    value.url = url
                     _requisitos.push(value)
                 }
             }
