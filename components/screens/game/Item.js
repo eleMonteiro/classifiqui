@@ -1,12 +1,17 @@
 import React, { Component } from "react";
 import { Image, View, StyleSheet, Button, Text } from "react-native";
 
-import storage from "@react-native-firebase/storage";
+import database from "@react-native-firebase/database"
+
+const ROOMS = '/rooms/'
+const PLAYERS = '/players/'
 
 export default class Game extends Component {
 
     constructor(props) {
         super(props);
+
+
     }
 
     getElement = () => {
@@ -78,8 +83,6 @@ export default class Game extends Component {
             </View>
         )
     }
-
-
 
     render() {
         return (

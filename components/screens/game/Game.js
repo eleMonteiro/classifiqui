@@ -53,7 +53,10 @@ export default class Game extends Component {
         });
     }
 
-    mudarVez = (vez) => {
+    mudarVez = async (vez) => {
+        await database().ref(ROOMS + this.state.sala.name + PLAYERS + vez)
+            .update({ jogadas: 1, usouAjuda: false })
+
         for (let i = 0; i < this.state.ordemJogada.length; i++) {
             const element = this.state.ordemJogada[i];
             if (vez == element['nickname'] && i == (this.state.ordemJogada.length - 1)) {
@@ -82,14 +85,22 @@ export default class Game extends Component {
         this.setState({ bonus: false })
     }
 
-    classificarRequisito = (requisito, tipo, indice) => {
+    classificarRequisito = async (requisito, tipo, indice) => {
         const _requisito = requisito
         const _tipo = _requisito['tipo']
 
         if (_tipo == tipo) {
             this.editarRequisitos(indice)
             this.pontuacao(this.state.vez)
-            this.setState({ bonus: true })
+
+            const sala = this.state.sala
+            var player
+
+            await database().ref(ROOMS + sala.name + PLAYERS + this.state.vez)
+                .once('value')
+                .then(snapshot => {
+                    player = snapshot.val()
+                })
         } else {
             Alert.alert('VOCÊ ERROU!');
             this.mudarVez(this.state.vez)
@@ -106,14 +117,31 @@ export default class Game extends Component {
         var player
 
         await database().ref(ROOMS + sala.name + PLAYERS + user)
-        .once('value')
-        .then(snapshot => {
-            player = snapshot.val()
-        })
+            .once('value')
+            .then(snapshot => {
+                player = snapshot.val()
+            })
 
-       await database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
-            .update({ pontuacao: player.pontuacao + 1, requisitosClassificados: player.requisitosClassificados + 1 })
+        await database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
+            .update({
+                pontuacao: player.pontuacao + 1,
+                requisitosClassificados: player.requisitosClassificados + 1,
+            })
 
+        if (player.jogadas == 1) {
+            await database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
+                .update({
+                    jogadas: player.jogadas + 1
+                })
+        }
+
+        if (player.jogadas == 1 && player.usouAjuda) {
+            this.mudarVez(this.state.vez)
+        }
+
+        if (player.jogadas == 2 && !player.usouAjuda) {
+            this.setState({ bonus: true })
+        }
     }
 
     render() {

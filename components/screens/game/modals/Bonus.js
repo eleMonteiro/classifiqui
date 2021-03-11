@@ -41,26 +41,27 @@ export default class BonusScreen extends Component {
             .once('value')
             .then(snapshot => {
                 player = snapshot.val()
+                console.log(player);
             })
 
             if (filho == 1 && player.ajudasAnalista < 1) {
                 database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
-                    .update({ ajudasAnalista: player.ajudasAnalista + 1 })
+                    .update({ ajudasAnalistaSenior: player.ajudasAnalista + 1 })
             }
 
             if (filho == 2 && player.ajudasProgramador < 1) {
                 database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
-                    .update({ ajudasProgramador: player.ajudasProgramador + 1 })
+                    .update({ ajudasAnalistaJunior: player.ajudasProgramador + 1 })
             }
 
             if (filho == 3) {
                 database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
-                    .update({ ajudasAnalista: player.ajudasAnalista + 1 })
+                    .update({ ajudasAnalistaSenior: player.ajudasAnalista + 1 })
             }
 
             if (filho == 4 || filho == 9) {
                 database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
-                    .update({ ajudasProgramador: player.ajudasProgramador + 1 })
+                    .update({ ajudasAnalistaJunior: player.ajudasProgramador + 1 })
             }
 
             if (filho == 5) {

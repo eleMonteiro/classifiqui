@@ -24,7 +24,6 @@ export default class Room extends Component {
 
     componentDidMount() {
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButtonClick);
-
         this.getUser()
     }
 
@@ -38,11 +37,11 @@ export default class Room extends Component {
 
     getUser = async () => {
         const userID = auth().currentUser.uid
-
         await database().ref(USERS + userID)
             .once('value')
             .then(snapshot => {
                 const user = snapshot.val()
+                console.log(user);
                 this.setState({ user: user })
             });
     }
@@ -93,9 +92,11 @@ export default class Room extends Component {
         await database().ref(ROOMS + element.name).update({ qtd: element.qtd + 1 })
         await database().ref(ROOMS + element.name + PLAYERS + user.nickname).set({
             nickname: user.nickname,
-            ajudasAnalista: 1,
-            ajudasProgramador: 2,
+            ajudasAnalistaSenior: 1,
+            ajudasAnalistaJunior: 2,
             requisitosClassificados: 0,
+            usouAjuda: false,
+            jogadas: 1,
             pontuacao: 0
         })
 
@@ -118,9 +119,11 @@ export default class Room extends Component {
             await database().ref(ROOMS + sala.name + PLAYERS + user.nickname)
                 .set({
                     nickname: user.nickname,
-                    ajudasAnalista: 1,
-                    ajudasProgramador: 2,
+                    ajudasAnalistaSenior: 1,
+                    ajudasAnalistaJunior: 2,
                     requisitosClassificados: 0,
+                    usouAjuda: false,
+                    jogadas: 1,
                     pontuacao: 0
                 })
 

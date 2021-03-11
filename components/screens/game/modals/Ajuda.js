@@ -59,8 +59,8 @@ export default class AjudaScreen extends Component {
         super(props);
 
         this.state = {
-            analista: null,
-            programador: null,
+            analistaSenior: null,
+            analistaJunior: null,
             user: this.props.route.params.user,
             sala: this.props.route.params.sala,
             req: this.props.route.params.req,
@@ -68,8 +68,8 @@ export default class AjudaScreen extends Component {
             ajudas: []
         }
 
-        this.usarAnalista = this.usarAnalista.bind(this)
-        this.usarProgramador = this.usarProgramador.bind(this)
+        this.usarAnalistaSenior = this.usarAnalistaSenior.bind(this)
+        this.usarAnalistaJunior = this.usarAnalistaJunior.bind(this)
         this.handleBackButtonClick = this.handleBackButtonClick.bind(this);
     }
 
@@ -82,17 +82,17 @@ export default class AjudaScreen extends Component {
                 this.setState({ player: snapshot.val() })
             })
 
-        if (!this.state.analista) {
-            const analistaRef = database().ref(AJUDAS).child('0');
-            analistaRef.on('value', (snapshot) => {
-                this.setState({ analista: snapshot.val() })
+        if (!this.state.analistaSenior) {
+            const analistaSeniorRef = database().ref(AJUDAS).child('0');
+            analistaSeniorRef.on('value', (snapshot) => {
+                this.setState({ analistaSenior: snapshot.val() })
             })
         }
 
-        if (!this.state.programador) {
-            const programadorRef = database().ref(AJUDAS).child('1');
-            programadorRef.on('value', (snapshot) => {
-                this.setState({ programador: snapshot.val() })
+        if (!this.state.analistaJunior) {
+            const analistaJuniorRef = database().ref(AJUDAS).child('1');
+            analistaJuniorRef.on('value', (snapshot) => {
+                this.setState({ analistaJunior: snapshot.val() })
             })
         }
 
@@ -108,7 +108,7 @@ export default class AjudaScreen extends Component {
         return true;
     }
 
-    usarAnalista = async () => {
+    usarAnalistaSenior = async () => {
         const sala = this.state.sala
 
         var player
@@ -118,7 +118,7 @@ export default class AjudaScreen extends Component {
                 player = snapshot.val()
             })
 
-        database().ref(ROOMS + sala.name + PLAYERS + player.nickname).update({ ajudasAnalista: player.ajudasAnalista - 1 })
+        database().ref(ROOMS + sala.name + PLAYERS + player.nickname).update({ ajudasAnalistaSenior: player.ajudasAnalistaSenior - 1, usouAjuda: true })
 
         const req = this.state.req['tipo']
         var resposta = null
@@ -150,7 +150,7 @@ export default class AjudaScreen extends Component {
     }
 
 
-    usarProgramador = async () => {
+    usarAnalistaJunior = async () => {
         const sala = this.state.sala
 
         var player
@@ -161,7 +161,7 @@ export default class AjudaScreen extends Component {
             })
 
 
-        database().ref(ROOMS + sala.name + PLAYERS + player.nickname).update({ ajudasProgramador: player.ajudasProgramador - 1 })
+        database().ref(ROOMS + sala.name + PLAYERS + player.nickname).update({ ajudasAnalistaJunior: player.ajudasAnalistaJunior - 1, usouAjuda: true })
 
 
         const req = this.state.req['tipo']
@@ -209,7 +209,7 @@ export default class AjudaScreen extends Component {
     }
 
     render() {
-        const { analista, programador, player } = this.state
+        const { analistaSenior, analistaJunior, player } = this.state
 
         return (
             <CardFlip style={styles.container} ref={card => (this.card = card)}>
@@ -218,18 +218,18 @@ export default class AjudaScreen extends Component {
                     style={styles.containerImagem}
                     onPress={() => this.card.flip()}>
                     {
-                        analista &&
+                        analistaSenior &&
                         <>
-                            <Image source={{ uri: analista['url'] }} style={styles.imagem} />
-                            <Text style={styles.text}>Ajudas Restantes: {player.ajudasAnalista}</Text>
+                            <Image source={{ uri: analistaSenior['url'] }} style={styles.imagem} />
+                            <Text style={styles.text}>Ajudas Restantes: {player.ajudasAnalistaSenior}</Text>
                         </>
                     }
                     {
-                        analista && player.ajudasAnalista >= 1 &&
+                        analistaSenior && player.ajudasAnalistaSenior >= 1 &&
                         <Button
                             color='#0D7A18'
                             title='USAR AJUDA'
-                            onPress={() => this.usarAnalista()}
+                            onPress={() => this.usarAnalistaSenior()}
                         />
                     }
                 </TouchableOpacity>
@@ -239,18 +239,18 @@ export default class AjudaScreen extends Component {
                     style={styles.containerImagem}
                     onPress={() => this.card.flip()}>
                     {
-                        programador &&
+                        analistaJunior &&
                         <>
-                            <Image source={{ uri: programador['url'] }} style={styles.imagem} />
-                            <Text style={styles.text}>Ajudas Restantes: {player.ajudasProgramador}</Text>
+                            <Image source={{ uri: analistaJunior['url'] }} style={styles.imagem} />
+                            <Text style={styles.text}>Ajudas Restantes: {player.ajudasAnalistaJunior}</Text>
                         </>
                     }
                     {
-                        programador && player.ajudasProgramador >= 1 &&
+                        analistaJunior && player.ajudasAnalistaJunior >= 1 &&
                         <Button
                             color='#0D7A18'
                             title='USAR AJUDA'
-                            onPress={() => this.usarProgramador()}
+                            onPress={() => this.usarAnalistaJunior()}
                         />
                     }
                 </TouchableOpacity>
