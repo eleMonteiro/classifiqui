@@ -38,33 +38,32 @@ export default class BonusScreen extends Component {
             const sala = this.state.sala
             var player
             await database().ref(ROOMS + sala.name + PLAYERS + this.props.route.params.vez)
-            .once('value')
-            .then(snapshot => {
-                player = snapshot.val()
-                console.log(player);
-            })
+                .once('value')
+                .then(snapshot => {
+                    player = snapshot.val()
+                })
 
-            if (filho == 1 && player.ajudasAnalista < 1) {
+            if (filho == 1 && player.ajudasAnalistaSenior < 1) {
                 database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
-                    .update({ ajudasAnalistaSenior: player.ajudasAnalista + 1 })
+                    .update({ ajudasAnalistaSenior: player.ajudasAnalistaSenior + 1 })
             }
 
-            if (filho == 2 && player.ajudasProgramador < 1) {
+            if (filho == 2 && player.ajudasAnalistaJunior < 1) {
                 database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
-                    .update({ ajudasAnalistaJunior: player.ajudasProgramador + 1 })
+                    .update({ ajudasAnalistaJunior: player.ajudasAnalistaJunior + 1 })
             }
 
             if (filho == 3) {
                 database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
-                    .update({ ajudasAnalistaSenior: player.ajudasAnalista + 1 })
+                    .update({ ajudasAnalistaSenior: player.ajudasAnalistaSenior + 1 })
             }
 
-            if (filho == 4 || filho == 9) {
+            if (filho == 4) {
                 database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
-                    .update({ ajudasAnalistaJunior: player.ajudasProgramador + 1 })
+                    .update({ ajudasAnalistaJunior: player.ajudasAnalistaJunior + 1 })
             }
 
-            if (filho == 5) {
+            if (filho == 5 || filho == 9 || filho == 11) {
                 database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
                     .update({ pontuacao: player.pontuacao + 1 })
             }
@@ -74,14 +73,9 @@ export default class BonusScreen extends Component {
                     .update({ pontuacao: player.pontuacao + 2 })
             }
 
-            if (filho == 10 || filho == 8) {
+            if (filho == 8 || filho == 10) {
                 database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
                     .update({ pontuacao: player.pontuacao + 3 })
-            }
-
-            if (filho == 10) {
-                database().ref(ROOMS + sala.name + PLAYERS + player.nickname)
-                    .update({ pontuacao: player.pontuacao + 1 })
             }
         }
 
