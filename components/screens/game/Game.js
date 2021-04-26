@@ -139,6 +139,10 @@ export default class Game extends Component {
             this.mudarVez(this.state.vez)
         }
 
+        if (player.jogadas == 2 && player.usouAjuda) {
+            this.mudarVez(this.state.vez)
+        }
+
         if (player.jogadas == 2 && !player.usouAjuda) {
             this.setState({ bonus: true })
         }
